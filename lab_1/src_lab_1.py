@@ -2,6 +2,9 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 
+from matplotlib.pyplot import figure
+figure(num=None, figsize=(20, 20), dpi=80, facecolor='w', edgecolor='k')
+
 
 def norm_distribution(x: float, mu: float, sigma: float):
     coeff = 1 / (sigma * math.sqrt(2 * math.pi))
@@ -32,7 +35,7 @@ def uniform_distribution(x, a, b):
     return 0
 
 
-def print_results(sizes, bins_nums, sample_gen_function, distrib_fun, is_discrete=False):
+def print_results(sizes, bins_nums, sample_gen_function, distrib_fun, is_discrete=False, fig_name=None):
     fig, axs = plt.subplots(len(sizes))
     for i in range(len(sizes)):
         sample = sample_gen_function(sizes[i])
@@ -44,4 +47,8 @@ def print_results(sizes, bins_nums, sample_gen_function, distrib_fun, is_discret
         y = distrib_fun(x)
         axs[i].plot(x, y)
         axs[i].grid()
+        axs[i].set_xlabel(fig_name + " (" + str(sizes[i]) + " samples)")
+        axs[i].set_ylabel("Density")
+    fig.subplots_adjust(hspace=0.75)
+    fig.savefig("src/" + fig_name + ".pdf")
     plt.show()
