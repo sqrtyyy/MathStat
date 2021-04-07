@@ -50,5 +50,5 @@ def print_results(sizes, bins_nums, sample_gen_function, distrib_fun, is_discret
         axs[i].set_xlabel(fig_name + " (" + str(sizes[i]) + " samples)")
         axs[i].set_ylabel("Density")
     fig.subplots_adjust(hspace=0.75)
-    fig.savefig("src/" + fig_name + ".pdf")
+    fig.savefig("paper/src/" + fig_name + ".pdf")
     plt.show()

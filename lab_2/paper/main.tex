@@ -1,0 +1,226 @@
+\documentclass[a4paper]{article}
+\usepackage{amsmath}
+\input{header}
+\begin{document}
+    \input{title}
+    \tableofcontents
+    \newpage
+    \listoftables
+    \newpage
+    \section{Постановка задачи}
+    Сгенерировать выборки размером 10, 100 и 1000 элементов.
+    Для каждой выборки вычислить следующие статистические характеристики положения данных: $\overline{x}, med\,x, z_R, z_Q, z_{tr}$.
+    Повторить такие вычисления 1000 раз для каждой выборки и найти среднее характеристик положения и их квадратов:
+    \begin{equation}\label{eq:mean_formula}
+        E(z)=\overline{z}
+    \end{equation}
+    Вычислить оценку дисперсии по формуле:
+    \begin{equation}\label{eq:variance_formula}
+        D(z)=\overline{z^2}-\overline{z}^2
+    \end{equation}
+    Представить полученные данные в виде таблиц.
+    \section{Теория}
+    \subsection{Вариационный ряд}
+Последовательность $\displaystyle\{x_{(k)}\}_{k=1}^n$ элементов выборки размера $n$, расположенных в неубывающем порядке, называется вариационным рядом.
+\subsection{Выборочные числовые характеристики}
+\subsubsection{Характеристики положения}
+\begin{itemize}
+    \item Выборочное среднее
+    \begin{equation}\label{mean}
+        \overline{x}=\frac{1}{n}\sum_{i=1}^n x_i
+    \end{equation}
+    \item Выборочная медиана
+    \begin{equation}\label{med}
+        med\,x = \begin{cases}
+        \displaystyle\;\;\;\;\;x_{(l+1)}&\text{при}\;\;n=2l+1\\
+        \displaystyle\frac{x_{(l)}+x_{(l+1)}}{2}&\text{при}\;\;n=2l
+        \end{cases}
+    \end{equation}
+    \item Полусумма экстремальных выборочных элементов
+    \begin{equation}\label{exhfsum}
+        z_R=\frac{x_{(1)}+x_{(n)}}{2}
+    \end{equation}
+    \item Полусумма квартилей\\
+    Выборочный квартиль $z_p$ порядка $p$ определяется формулой
+    \begin{equation}
+        z_p = \begin{cases}\label{pqv}
+        \displaystyle\;\;x_{([np]+1)}&\text{при}\;\;np\;\text{дробном,}\\
+        \displaystyle\;\;\;\;\;x_{(np)}&\text{при}\;\;np\;\text{целом}
+        \end{cases}
+    \end{equation}
+    Полусумма квартилей
+    \begin{equation}\label{eq:hfsum}
+        z_Q=\frac{z_{1/4}+z_{3/4}}{2}
+    \end{equation}
+    \item Усечённое среднее
+    \begin{equation}\label{eq:trmean}
+        z_{tr}=\frac{1}{n-2r}\sum_{i=r+1}^{n-r}x_{(i)},\;\;r\approx\frac{n}{4}
+    \end{equation}
+\end{itemize}
+    \subsubsection{Характеристики рассеивания}
+Выборочная дисперсия
+\begin{equation}\label{eq:svar}
+    D=\frac{1}{n}\sum_{i=1}^n \left(x_i-\overline{x}\right)^2
+\end{equation}
+    \section{Реализация}
+        Лабораторная работа выполнена на языке Python в среде PyCharm с использованием следующих библиотек:
+        \begin{enumerate}
+            \item numpy
+        \end{enumerate}
+    \section{Результаты}
+        \begin{table}[H]
+            \centering
+            \begin{tabular}{|c|c|c|c|c|c|}
+                \hline
+                \input{src/normal_10_table}
+            \end{tabular}
+            \caption{Нормальное распределение 10 элементов}
+            \label{tab:norm_10}
+        \end{table}
+
+        \begin{table}[H]
+            \centering
+            \begin{tabular}{|c|c|c|c|c|c|}
+                \hline
+                \input{src/normal_100_table}
+            \end{tabular}
+            \caption{Нормальное распределение 100 элементов}
+            \label{tab:norm_100}
+        \end{table}
+
+         \begin{table}[H]
+            \centering
+            \begin{tabular}{|c|c|c|c|c|c|}
+                \hline
+                \input{src/normal_1000_table}
+            \end{tabular}
+            \caption{Нормальное распределение 1000 элементов}
+            \label{tab:norm_1000}
+        \end{table}
+
+        \begin{table}[H]
+            \centering
+            \begin{tabular}{|c|c|c|c|c|c|}
+                \hline
+                \input{src/cauchy_10_table}
+            \end{tabular}
+            \caption{Распределение Коши 10 элементов}
+            \label{tab:cauchy_10}
+        \end{table}
+
+        \begin{table}[H]
+            \centering
+            \begin{tabular}{|c|c|c|c|c|c|}
+                \hline
+                \input{src/cauchy_100_table}
+            \end{tabular}
+            \caption{Распределение Коши 100 элементов}
+            \label{tab:cauchy_100}
+        \end{table}
+
+        \begin{table}[H]
+            \centering
+            \begin{tabular}{|c|c|c|c|c|c|}
+                \hline
+                \input{src/cauchy_1000_table}
+            \end{tabular}
+            \caption{Распределение Коши 1000 элементов}
+            \label{tab:cauchy_1000}
+        \end{table}
+
+        \begin{table}[H]
+            \centering
+            \begin{tabular}{|c|c|c|c|c|c|}
+                \hline
+                \input{src/laplace_10_table}
+            \end{tabular}
+            \caption{Распределение Лапласа 10 элементов}
+            \label{tab:laplace_10}
+        \end{table}
+
+        \begin{table}[H]
+            \centering
+            \begin{tabular}{|c|c|c|c|c|c|}
+                \hline
+                \input{src/laplace_100_table}
+            \end{tabular}
+            \caption{Распределение Лапласа 100 элементов}
+            \label{tab:laplace_100}
+        \end{table}
+
+        \begin{table}[H]
+            \centering
+            \begin{tabular}{|c|c|c|c|c|c|}
+                \hline
+                \input{src/laplace_1000_table}
+            \end{tabular}
+            \caption{Распределение Лапласа 1000 элементов}
+            \label{tab:laplace_1000}
+        \end{table}
+
+        \begin{table}[H]
+            \centering
+            \begin{tabular}{|c|c|c|c|c|c|}
+                \hline
+                \input{src/poisson_10_table}
+            \end{tabular}
+            \caption{Распределение Пуассона 10 элементов}
+            \label{tab:poisson_10}
+        \end{table}
+
+        \begin{table}[H]
+            \centering
+            \begin{tabular}{|c|c|c|c|c|c|}
+                \hline
+                \input{src/poisson_100_table}
+            \end{tabular}
+            \caption{Распределение Пуассона 100 элементов}
+            \label{tab:poisson_100}
+        \end{table}
+
+        \begin{table}[H]
+            \centering
+            \begin{tabular}{|c|c|c|c|c|c|}
+                \hline
+                \input{src/poisson_1000_table}
+            \end{tabular}
+            \caption{Распределение Пуассона 1000 элементов}
+            \label{tab:poisson_1000}
+        \end{table}
+
+        \begin{table}[H]
+            \centering
+            \begin{tabular}{|c|c|c|c|c|c|}
+                \hline
+                \input{src/uniform_10_table}
+            \end{tabular}
+            \caption{Равномерное распределение 10 элементов}
+            \label{tab:uniform_10}
+        \end{table}
+
+        \begin{table}[H]
+            \centering
+            \begin{tabular}{|c|c|c|c|c|c|}
+                \hline
+                \input{src/uniform_100_table}
+            \end{tabular}
+            \caption{Равномерное распределение 100 элементов}
+            \label{tab:uniform_100}
+        \end{table}
+
+        \begin{table}[H]
+            \centering
+            \begin{tabular}{|c|c|c|c|c|c|}
+                \hline
+                \input{src/uniform_1000_table}
+            \end{tabular}
+            \caption{Равномерное распределение 1000 элементов}
+            \label{tab:uniform_1000}
+        \end{table}
+
+    \section{Обсуждение}
+        Можно заметить, что дисперсия характеристик рассеяния для распределения Коши является аномально болишим по сравнению с другими распределениями.
+        Даже при увиличении размера выборки ситуация не меняется. Это можно обяснить выбросами, которые наблюдались в результатах предыдущей работы.
+    \section*{Примечание}
+        С кодом работы и отчета можно ознакомиться по ссылке:\;\url{https://github.com/sqrtyyy/MathStat/tree/master/lab_2}
+\end{document}
