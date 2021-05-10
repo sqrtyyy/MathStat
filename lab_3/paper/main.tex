@@ -1,0 +1,138 @@
+\documentclass[a4paper]{article}
+\usepackage{amsmath}
+\input{header}
+\begin{document}
+    \input{title}
+    \tableofcontents
+    \newpage
+    \listoftables
+    \newpage
+\section {Постановка задачи}
+\noindent Для 5 распределений:
+\begin{enumerate}
+	\item $N(x, 0, 1)$ -- нормальное распределение
+	\item $C(x, 0, 1)$ -- распределение Коши
+	\item $L(x, 0, \frac{1}{\sqrt{2}})$ -- распределение Лапласа
+	\item $P(k, 10)$ -- распределение Пуассона
+	\item $U(x, -\sqrt{3}, \sqrt{3})$ -- расномерное распределение
+\end{enumerate}
+Сгенерировать выборки размером 20 и 100 элементов.
+Построить для них боксплот Тьюки.
+Для каждого распределения определить долю выбросов экспериментально (сгенерировав выборку, соответствующую распределению 1000 раз, и вычислив среднюю долю выбросов) и сравнить с результатами, полученными теоретически.
+
+
+\section {Теория}
+\subsection{Боксплот Тьюки}
+	\subsubsection{Определение}
+	\noindent Боксплот (англ. box plot) — график, использующийся в описательной статистике, компактно изображающий одномерное распределение вероятностей
+
+	\subsubsection{Описание}
+	\noindent Такой вид диаграммы в удобной форме показывает медиану, нижний и верхний квартили и выбросы. Несколько таких ящиков можно нарисовать бок о бок, чтобы визуально сравнивать одно распределение с другим; их можно располагать как горизонтально, так и вертикально. Расстояния между различными частями ящика позволяют определить степень разброса (дисперсии) и асимметрии данных и выявить выбросы.
+
+	\subsubsection{Построение}
+	\noindent Границами ящика служат первый и третий квартили, линия в середине ящика — медиана. Концы усов — края статистически значимой выборки (без выбросов). Длину «усов» определяют разность первого квартиля и полутора межквартильных расстояний и сумма третьего квартиля и полутора межквартильных расстояний. Формула имеет вид
+	\begin{equation}
+	\label{mouns}
+	{X_1 = Q_1-} \frac{3}{2}{(Q_3 - Q_1)},   {X_2 = Q_3+} \frac{3}{2}{(Q_3 - Q_1)}
+	\end{equation}
+	где $X_1$ — нижняя граница уса, $X_2$ — верхняя граница уса, $Q_1$ — первый квартиль, $Q_3$ — третий квартиль. Данные, выходящие за границы усов (выбросы), отображаются на графике в виде маленьких кружков.
+
+
+\subsection{Теоретическая вероятность выбросов}
+	\noindent Встроенными средствами языка программирования Python в среде разработки PyCharm можно вычислить теоретические первый и третий квартили распределений ($Q_1^T$ и $Q_3^T$ соответственно). По формуле \eqref{mouns} можно вычислить теоретические нижнюю и верхнюю границы уса ($X_1^T$ и $X_2^T$ соответственно). Выбросами считаются величины x, такие что:
+	\begin{equation}
+		\left[
+		\begin{gathered}
+		x < X_1^T \\
+		x > X_2^T \\
+		\end{gathered}
+		\right.
+	\end{equation}
+	Теоретическая вероятность выбросов для непрерывных распределений
+	\begin{equation}
+		P_B^T = P(x<X_1^T) + P(x>X_2^T)=F(X_1^T) + (1-F(X_2^T))
+	\end{equation}
+	где $F(X)=P(x\leq{X})$ - функция распределения.
+	Теоретическая вероятность выбросов для дискретных распределений
+	\begin{equation}
+		P_B^T = P(x<X_1^T)+P(x>x_2^T)=(F(X_1^T)-P(x=X_1^T))+(1-F(X_2^T))
+	\end{equation}
+	где $F(X) = P(x\leq{X})$ - функция распределения
+
+\section{Программная реализация}
+Лабораторная работа выполнена на языке Python в среде PyCharm с использованием следующих библиотек:
+\begin{enumerate}
+    \item numpy
+    \item scipy
+    \item matplotlib
+\end{enumerate}
+
+\section {Результаты}
+\subsection{Боксплот Тьюки}
+\begin{figure}[H]
+\center{\includegraphics[scale=0.75]{src/normal}}
+\label{fig:normal}
+\caption{Нормальное распределение}
+\end{figure}
+
+\begin{figure}[H]
+\center{\includegraphics[scale=0.75]{src/cauchy}}
+\label{fig:cauchy}
+\caption{распределение Коши}
+\end{figure}
+
+\begin{figure}[H]
+\center{\includegraphics[scale=0.75]{src/laplace}}
+\label{fig:laplace}
+\caption{распределение Лапласа}
+\end{figure}
+
+\begin{figure}[H]
+\center{\includegraphics[scale=0.75]{src/poisson}}
+\label{fig:poisson}
+\caption{распределение Пуассона}
+\end{figure}
+
+\begin{figure}[H]
+\center{\includegraphics[scale=0.75]{src/uniform}}
+\label{fig:uniform}
+\caption{равномерное распределение}
+\end{figure}
+
+\subsection{Доля выбросов}
+\begin{table}[H]
+            \centering
+            \begin{tabular}{|c|c|c|}
+                \hline
+                \input{src/experimental_anomaly_table.tex}
+            \end{tabular}
+            \caption{Доля выбросов}
+            \label{tab:experimental_anomaly}
+            \end{table}
+
+
+\subsection{Теоретическая вероятность выбросов}
+\begin{table}[H]
+            \centering
+            \begin{tabular}{|c|c|c|c|c|c|}
+                \hline
+                \input{src/theoretical_anomaly_table.tex}
+            \end{tabular}
+            \caption{Теоретическая вероятность выбросов}
+            \label{tab:theoretical_anomaly}
+            \end{table}
+
+\section{Обсуждение}
+В данной работе видно, что боксплоты Тьюки удобны для взуального представления важных
+характеристик выборки. Из них можно делать выводы относительно
+вида распределения, которому подчиняется выборка.
+
+Данные в таблице говорят о том, что чем выше размер выборки, тем ближк доля выбросов к теоретической оценке. У распределения коши наблюдается самая высокая доля выбросов, в то время как в равномерном распределении доля выбросов близка к 0.
+
+\section{Приложение}
+
+\noindent Код программы GitHub URL:\\
+\newline https://github.com/Brightest-Sunshine/Math-Statistic-2021/blob/main/Lab3/Lab3.ipynb
+
+\end{document}
+
