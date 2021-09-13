@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 import csv
 
@@ -18,7 +20,10 @@ def z_q(sampled_values):
 def z_tr(sampled_values):
     n = len(sampled_values)
     r = int(n / 4)
-    return sum(sampled_values[r + 1: n - r]) / (n - 2 * r)
+    sum = 0
+    for i in range(r + 1, n - r + 1):
+        sum += sampled_values[i]
+    return sum / (n - 2 * r)
 
 
 def fun(samples_sizes, number_of_calc, sample_gen_function):
@@ -39,12 +44,26 @@ def fun(samples_sizes, number_of_calc, sample_gen_function):
             z_qs.append(z_q(sample))
             z_trs.append(z_tr(sample))
         values = [means, medians, z_rs, z_qs, z_trs]
-        E_s.append(np.mean(value) for value in values)
-        D_s.append(np.var(value) for value in values)
-    return E_s,D_s
+        E_s.append([float(np.mean(value)) for value in values])
+        D_s.append([float(np.var(value)) for value in values])
+    return E_s, D_s
 
 
-def createLatexTable(table_name: str, E, D , tolerance = 4):
+def estimate(x: float, y: float):
+    x_str = str(x)
+    y_str = str(y)
+    i = 0
+    common_str = ""
+    while i < len(x_str) and i < len(y_str) and x_str[i] == y_str[i]:
+        common_str = common_str + x_str[i]
+        i = i + 1
+    estimate_str = common_str.split(".")
+    if len(estimate_str) != 2:
+        return 0
+    return len(estimate_str[1])
+
+
+def createLatexTable(table_name: str, E: list, D : list, tolerance=4):
     with open(table_name + "_table.tex", "w", newline='') as file:
         writer = csv.writer(file, delimiter='&')
         row = [" ", r"$\overline{x}$", r"$med\ x$", "$z_R$", "$z_Q$", r"$z_{tr}$ \\ \hline"]
@@ -55,6 +74,19 @@ def createLatexTable(table_name: str, E, D , tolerance = 4):
         writer.writerow(row)
         row = [str(round(val, tolerance)) for val in D]
         row.insert(0, r"$D\left(z\right)$")
+        row[-1] += r"\\ \hline"
+        writer.writerow(row)
+        row = [str(round(E[i] + math.sqrt(D[i]), tolerance)) for i in range(len(list(E)))]
+        row.insert(0, r"$E + \sqrt{D}$")
+        row[-1] += r"\\ \hline"
+        writer.writerow(row)
+        row = [str(round(E[i] - math.sqrt(D[i]), tolerance)) for i in range(len(list(E)))]
+        row.insert(0, r"$E - \sqrt{D}$")
+        row[-1] += r"\\ \hline"
+        writer.writerow(row)
+        est_arr = [estimate(abs(round(E[i] - math.sqrt(D[i]), tolerance)), round(E[i] + math.sqrt(D[i]), tolerance)) for i in range(len(list(E)))]
+        row = [str(int(D[i] * (10 ** est_arr[i])) / (10 ** est_arr[i])) if est_arr[i] != 0 else "-" for i in range(len(est_arr))]
+        row.insert(0, r"\widehat{E}(z)")
         row[-1] += r"\\ \hline"
         writer.writerow(row)
 
