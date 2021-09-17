@@ -14,7 +14,7 @@ def create_latex_table(table_name: str, angle_elem: str, rows_names: list, colum
         row[-1] += r"\\ \hline"
         writer.writerow(row)
         for row_number in range(len(rows_names)):
-            row = [str(round(val, tolerance)) for val in values_matrix[row_number]]
+            row = [str(round(val, tolerance)) if isinstance(val, float) else str(val) for val in values_matrix[row_number]]
             row.insert(0, rows_names[row_number])
             row[-1] += r"\\ \hline"
             writer.writerow(row)
@@ -25,10 +25,11 @@ def draw_plot_subplots(name: str, titles, xlabels, ylabels, xs, ys, path_to_save
     for i in range(nrows):
         for j in range(ncols):
             idx = i * ncols + j
-            axs[idx].plot(xs[idx], ys[idx])
-            axs[idx].set_xlabel(xlabels[idx])
-            axs[idx].set_ylabel(ylabels[idx])
-            axs[idx].set(title=titles[idx])
+            ax = axs if nrows + ncols == 2 else axs[idx]
+            ax.plot(xs[idx], ys[idx])
+            ax.set_xlabel(xlabels[idx])
+            ax.set_ylabel(ylabels[idx])
+            ax.set(title=titles[idx])
     fig.subplots_adjust(wspace=0.75)
     fig.savefig(path_to_save + name + ".pdf")
     return fig, axs
