@@ -1,0 +1,204 @@
+\documentclass[a4paper]{article}
+\usepackage{amsmath}
+\input{header}
+\begin{document}
+    \input{title}
+    \tableofcontents
+    \newpage
+    \listoffigures
+    \newpage
+    \section{Постановка задачи}
+    Требуется произвести калибровку шкалы измерителя, с нерегулярными отсчетами по предоставленным данным.\\
+    Для этого нужно:
+\begin{enumerate}
+    \item Определить амплитуду гармонического сигнала по набору отсчетов
+    \item Использовать интервальный подход к решению переопределенных СЛАУ для точного определения амплитуды
+    \\item Определить фазы отсчетов по амплитуде
+\end{enumerate}
+
+\section{Теория}
+    \subsection{Интервал неопределенности}
+        Мы говорим, что измерение $y = f(t)$ имеет интервалом неопределенности $[a, b], a, b \in \mathbb{R}$, если предполагаем, что это измерение принадлежит какой-то точке этого интервала. Например, если прибор по
+        измерению показал значение $\overline{y}$ и известно, что прибор имеет погрешность $\epsilon$, тогда на практике для
+        описания неопределенности выбирают интервал $[\overline{y} - \epsilon, \overline{y} + \epsilon]$. Для интервалов в литературе определена
+        арифметика.\cite{Bazhenov}
+    \subsection{Алгебра интервалов}
+        Для интервалов существует стандартная алгебра:
+        \begin{itemize}
+            \item $\overline{A}+\underline{A}=[\overline{a},\overline{b}]+[\underline{a},\underline{b}]=[\overline{a}+\underline{a},\overline{b}+\underline{b}]$
+            \item $\overline{A}-\underline{A}=[\overline{a},\overline{b}]-[\underline{a},\underline{b}]=[\overline{a}-\underline{a},\overline{b}-\underline{b}]$
+            \item $\overline{A}*\underline{A}=[\overline{a},\overline{b}]*[\underline{a},\underline{b}]=[\min(\overline{a}\underline{a},\overline{a}\underline{b},\overline{b}\underline{a},\overline{b}\underline{b}),\max(\overline{a}\underline{a},\overline{a}\underline{b},\overline{b}\underline{a},\overline{b}\underline{b})]$
+            \item $\overline{A}/\underline{A}=[\overline{a},\overline{b}]/[\underline{a},\underline{b}]=[\overline{a},\overline{b}]*[1 / \underline{a},1 / \underline{b}]$
+        \end{itemize}
+        \subsection{Интервальная матрица}
+            \begin{equation}
+                A=
+                    \begin{pmatrix}
+                        a_{11} & \dots & a_{1n}\\
+                        \vdots & \ddots & \vdots\\
+                        a_{m1} & \dots & a_{mn}\\
+                    \end{pmatrix}\label{eq:IMATRIX}
+            \end{equation}
+            где $a_{ij}$ - интервал, $i=\overline{1,m},j=\overline{1,n}$.
+        \subsection{Интервальная СЛАУ(ИСЛАУ)}
+        \begin{equation}
+            \left\{
+            \begin{array}{ll}
+                a_{11}x_1+\ldots+a_{1n}x_n=b_1\\
+                \ldots\\
+                a_{m1}x_1+\ldots+a_{mn}x_n=b_m\\
+            \end{array}
+            \right.\label{eq:ISLAU}
+        \end{equation}
+        где $a_{ij},b_i$ - интервалы, $i=\overline{1,m},j=\overline{1,n}$, или $Ax=B$, где $A=(a_{ij})$ - интервальная матрица, $B=(b_i)$ - интервальный вектор.
+    \subsection{Множество решений ИСЛАУ}
+    Объединенное множество $\mathsf{\Xi}_{uni}(A,B)=\{x\in{\mathbb{R}^n}|\exists{A'}\in{A},\exists{B'}\in{B},A'x=B'\}$ \\
+    Допусковое множество $\mathsf{\Xi}_{tol}(A,B)=\{x\in{\mathbb{R}^n}|\forall{A'}\in{A},\exists{B'}\in{B},A'x=B'\}$ \\\\
+    При этом $\mathsf{\Xi}_{tol}(A,B)\subseteq{\mathsf{\Xi}_{uni}(A,B)}$.
+
+\subsection{Задача восстановления зависимости}
+    Задача восстановления зависимости – это распространённая задача, в которой по эмпирическим данным требуется построить
+    зависимость заданного вида. В реальных задачах восстановления зависимости эмпирические данные почти всегда не точные,
+    так как на результаты измерений влияют внешние неконтролируемые факторы и измерительные приборы всегда имеют погрешность
+    в измерениях. Возникшую неопределенность входных данных, будем описывать спомощью интервального анализа.
+    Пусть $A$ - интервальная матрица, $B$ - интервальный столбец эмпирических данных.\\\\
+    Тогда $Ax=B$ - ИСЛАУ, где $x_1,\dots,x_n$ - оценки исходных параметров.\\\\
+    Решение данного ИСЛАУ в общем случае представляет собой множество $\mathsf{\Xi}_{uni}(A,B)$.
+    Если требуется сильное  согласование параметров с интервальными экспериментальными данными, то решением является
+    множество $\mathsf{\Xi}_{tol}(A,B)$.
+
+    \subsection{Определение параметров гармонического сигнала}
+Необходимо выполнить масштабирование исходной выборки $\{y_i\}$ - амплитудные значения сигнала в промежуток $[0,1]$ и вычислить амплитуду арксинуса как пересечение прямых, проходящих через линейно зависимые точки. При этом учитываем, что амплитудные значения $y_i$ даны с погрешностью.
+    \subsection{Алгоритм поиска коэффициентов прямой $y=a^+x+b^+$ с положительным наклоном}
+
+\begin{enumerate}
+    \item Находим множество индексов $I^+=\{I^+_{k0},...,I^+_{kn}\}$, где $I^+_{ki}$ - множество точек, лежащих на одной прямой с положительным наклоном.
+    \item При этом каждая точка должна удовлетворять условию $y=a^+i+b^++dk$, где $d$ - смещение из-за периода.
+    \item Построить интервальные оценки по спецификации прибора для $i:[i-\frac{1}{2},i+\frac{1}{2}]$, для $y:[y-0.015|y|,y+0.015|y|]$
+    \item Составить ИСЛАУ, подставив соответствующие интервальные оценки в СЛАУ вида:
+        \begin{equation}
+            \begin{pmatrix}
+                i_0 & 1 & 0\\
+                ... & ... & ...\\
+                i_j & 1 & k\\
+                ... & ... & ...\\
+                i_n & 1 & l\\        
+            \end{pmatrix}
+            \begin{pmatrix}
+                a\\
+                b\\
+                d\\
+            \end{pmatrix}
+            =
+            \begin{pmatrix}
+                y_0\\
+                ...\\
+                y_j\\
+                ...\\
+                y_n\\        
+            \end{pmatrix}
+        \end{equation}
+        где $i_j\in{I^+_{kj}}$
+    \item Применить метод максимального согласования для нахождения оценок параметров $a$ и $b$
+    \end{enumerate}
+
+Таким образом, с помощью найденных $a^+,b^+,a^-,b^-$ находится амплитуда арксинуса как ордината точки пересечения соответствующих прямых.\cite{VKR}
+
+\subsection{Определение фаз отсчетов сигнала}
+    Необходимо провести масштабирование $\{y_i\}$ так, чтобы амплитуда стала равной $\frac{\pi}{2}$. Тогда $\Delta{t_i}=\frac{\Delta{y_i}}{2\pi\vartheta}$.
+    При этом временной интервал вычисляется для точек, по котором производилось построение прямых, а временной интервал между соседними измерениями
+    $\Delta{t_i}$ вычисляется как среднее по всем сигналам.
+\section{Реализация}
+\begin{itemize}
+    \item numpy
+    \item matplotlib
+    \item math
+    \item tolsolvty
+\end{itemize}
+
+\section{Результаты}
+    Разобьем работу на 2 этапа:
+    \begin{itemize}
+        \item Амплитудная калибровка
+        \begin{itemize}
+            \item Подать поочередно сигналы констант и построить по ним усредненные значения для каждой ячейки (набор уровней)
+            \item Построить кусочно-линейную интерполяцию сигнала
+        \end{itemize}
+        \item Применение интервального анализа к временной калибровке
+            \begin{itemize}
+                \item Определить параметры гармонического сигнала по амплитудным значениям
+                \item Определить фазы отсчетов сигнала
+            \end{itemize}
+    \end{itemize}
+
+    \subsection{Амплитудная калибровка}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[scale=0.8]{src/AmplitudeValues}
+            \caption{Амплитуды входного сигнала при измерении константных сигналов, цветом обозначены разные значения констант}
+        \end{figure}
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale=0.8]{src/AmplitudeValuesWithSignals}
+        \caption{Оцифрованный сигнал с иллюстрацией константных сигналов}
+    \end{figure}
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale=0.8]{src/InterpolatedSignal}
+        \caption{Интерполированный сигнал}
+    \end{figure}
+    \subsection{Применение интервального анализа к временной калибровке}
+        \begin{figure}[H]
+            \centering
+            \includegraphics[scale=0.8]{src/Signal[0,1]}
+            \caption{Масштабированный сигнал на [0,1]}
+        \end{figure}
+        \begin{figure}[H]
+                \centering
+                \includegraphics[scale=0.8]{src/ScaledSignal}
+            \caption{Арксинус сигнала}
+        \end{figure}
+
+        \begin{figure}[H]
+            \centering
+            \includegraphics[scale=0.8]{src/ArcsinParams}
+            \caption{Нахождение амплитуды сигнала}
+        \end{figure}
+
+        \begin{figure}[H]
+            \centering
+            \includegraphics[scale=0.8]{src/TimePeriods}
+            \caption{Временная шкала сигнала}
+        \end{figure}
+
+        \begin{figure}[H]
+            \centering
+            \includegraphics[scale=0.8]{src/TimeHistogram}
+            \caption{Гистограмма распределения ширин временных бинов}
+        \end{figure}
+
+\section{Обсуждение}
+    \begin{itemize}
+        \item Использование функции арксинуса, позволяет решить проблему недостаточности точек, так как появится возможность использовать
+              практически все точки, а не только в линейной области.
+        \item Использование интервального анализа для поиска коэффициента прямых позволяет найти коэффициенты прямых в
+              условиях, когда амплитудные значения даны с погрешностью, а также из-за неравномерных временных отсчетов,
+              возникает погрешность в индексации.
+        \item На гистограмме распределения временных ширин наблюдается бимодальность, что соответствует
+              измерениям других авторов. \cite{VKR}.
+    \end{itemize}
+
+    \section{Примечание}
+        С кодом работы и отчета можно ознакомиться по ссылке:\;\url{https://github.com/sqrtyyy/MathStat/tree/master/coursework}
+
+\section{Список используемой литературы}
+    \begin{thebibliography}{3}
+        \bibitem{Bazhenov}
+        Баженов А.Н. Интервальный анализ. Основы теории и учебные примеры. - Спб., 2020
+        \bibitem{VKR}
+        Билев Ф.А. Исследование применения интервального подхода к задаче калибровки шкалы измерителя с нерегулярными отсчетами // Бакалаврская работа. / Рук.: Баженов А.Н. - С.-П. : СПБПУ. - 2017.
+    \end{thebibliography}
+
+\end{document}
