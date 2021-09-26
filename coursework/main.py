@@ -123,8 +123,7 @@ path = "paper/src/"
 data_src_dir = 'data'
 
 signal_id = 14
-signal_path = '/Sin_100MHz/sin_100MHz_' + str(signal_id)
-
+signal_path = '/Sin_100MHz/sin_100MHz_'
 path_minus_0_5 = '/-0_5V/-0_5V_'
 path_minus_0_25 = '/-0_25V/-0_25V_'
 path_zero = '/ZeroLine/ZeroLine_'
@@ -138,7 +137,8 @@ color4 = 'g'
 color5 = 'm'
 color6 = 'y'
 
-data1 = cw_src.read_file(data_src_dir + signal_path + ".txt", array_size=1024)
+data1 = cw_src.read_file(data_src_dir + signal_path + str(signal_id) + ".txt", array_size=1024)
+all_data = cw_src.read_files_in_dir(data_src_dir + signal_path, array_size=1024, num_of_files=100)
 data2 = cw_src.read_files_in_dir(data_src_dir + path_minus_0_5, array_size=1024, num_of_files=100)
 data3 = cw_src.read_files_in_dir(data_src_dir + path_minus_0_25, array_size=1024, num_of_files=100)
 data4 = cw_src.read_files_in_dir(data_src_dir + path_zero, array_size=1024, num_of_files=100)
@@ -146,13 +146,14 @@ data5 = cw_src.read_files_in_dir(data_src_dir + path_plus_0_25, array_size=1024,
 data6 = cw_src.read_files_in_dir(data_src_dir + path_plus_0_5, array_size=1024, num_of_files=100)
 
 data1 = np.mean(data1, axis=1)
+all_data = cw_src.average_data(data=all_data)
 data2 = cw_src.average_data(data=data2)
 data3 = cw_src.average_data(data=data3)
 data4 = cw_src.average_data(data=data4)
 data5 = cw_src.average_data(data=data5)
 data6 = cw_src.average_data(data=data6)
 
-fig, ax = cw_src.draw_amplitudes(data2, color2)
+fig, ax = cw_src.draw_amplitudes(data1, color1)
 cw_src.draw_amplitudes(data2, color2, fig=fig, ax=ax)
 cw_src.draw_amplitudes(data3, color3, fig=fig, ax=ax)
 cw_src.draw_amplitudes(data4, color4, fig=fig, ax=ax)
@@ -168,12 +169,21 @@ dc = [-0.5, -0.25, 0.0, 0.25, 0.5]
 constants = np.array([data2, data3, data4, data5, data6])
 
 data1 = interpolation(data1, dc, constants, len(data1), len(constants))
+all_data = interpolation(all_data, dc, constants, len(data1), len(constants))
 fig, ax = cw_src.draw_amplitudes(data1, color1)
 fig.savefig(path + "InterpolatedSignal" + ".pdf")
 
 sin_data = np.divide(data1, max(abs(max(data1)), abs(min(data1))))
 sin_data = np.add(sin_data, 1)
 sin_data = np.divide(sin_data, max(sin_data))
+
+all_data = np.divide(all_data, max(abs(max(all_data)), abs(min(all_data))))
+all_data = np.add(all_data, 1)
+all_data = np.divide(all_data, max(all_data))
+#all_data = np.arcsin(all_data)
+
+
+data1 = sin_data
 
 fig, ax = cw_src.draw_amplitudes(sin_data, color1)
 fig.savefig(path + "Signal[0,1]" + ".pdf")
@@ -191,12 +201,13 @@ cw_src.draw_arcsin_lines(a1, b1, a2, b2, ax, 50)
 fig.savefig(path + "ArcsinParams" + ".pdf")
 
 data1 = cw_src.set_amplitude(data1, ampl)
+all_data =cw_src.set_amplitude(all_data, ampl)
 
 fig, ax = plt.subplots()
 x_i = cw_src.draw_delta_times(data=data1, num_of_dots=40, ax=ax)
 fig.savefig(path + "TimePeriods" + ".pdf")
 
 fig, ax = plt.subplots()
-cw_src.draw_hist(data=data1, num_of_dots=data1.size, ax=ax)
+cw_src.draw_hist(data=all_data, ax=ax)
 fig.savefig(path + "TimeHistogram" + ".pdf")
 

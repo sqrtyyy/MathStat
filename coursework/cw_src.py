@@ -65,19 +65,18 @@ def draw_delta_times(data: np.array, num_of_dots: int, ax) -> np.array:
     t_i = np.zeros(num_of_dots)
     for i in range(num_of_dots):
         t_i[i] = (data[i + 1] - data[i]) / (2 * math.pi)
-
+    t_i = np.add(t_i, abs(min(t_i)))
     ax.set_xlabel('time(ps)')
     ax.scatter(t_i, [1] * num_of_dots, marker='.')
     return t_i
 
 
 def draw_hist(data: np.array, ax) -> None:
-    x, y = [], []
+    y = []
     for element in data:
-        x.append(1)
         y.append(element / (2 * math.pi))
     ax.set_xlabel('time')
-    ax.hist(y)
+    ax.hist(y, bins=16)
 
 def restore_fun(data: np.array, x_i: np.array, tolerance: float):
     def D_M(x: float) -> float:
