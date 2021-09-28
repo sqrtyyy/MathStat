@@ -165,11 +165,16 @@ fig.savefig(path + "AmplitudeValues" + ".pdf")
 cw_src.draw_amplitudes(data1, color1, fig=fig, ax=ax)
 fig.savefig(path + "AmplitudeValuesWithSignals" + ".pdf")
 
-dc = [-0.5, -0.25, 0.0, 0.25, 0.5]
-constants = np.array([data2, data3, data4, data5, data6])
+dc = np.array([-0.5, -0.25, 0.0, 0.25, 0.5])
+cw_src.get_coeffs(dc, np.array([data2, data3, data4, data5, data6]))
 
-data1 = interpolation(data1, dc, constants, len(data1), len(constants))
+dc = np.array([-0.5, -0.25, 0.0, 0.25, 0.5])
+constants = np.array([data2, data3, data4, data5, data6])
+fig, ax = plt.subplots()
+data1 = cw_src.interpolate(dc, constants, data1, ax)
 all_data = interpolation(all_data, dc, constants, len(data1), len(constants))
+fig.savefig(path + "Regress" + ".pdf")
+
 fig, ax = cw_src.draw_amplitudes(data1, color1)
 fig.savefig(path + "InterpolatedSignal" + ".pdf")
 
@@ -189,6 +194,9 @@ fig, ax = cw_src.draw_amplitudes(sin_data, color1)
 fig.savefig(path + "Signal[0,1]" + ".pdf")
 
 sin_data = np.arcsin(sin_data)
+
+fig, ax = cw_src.draw_amplitudes(sin_data, color1)
+fig.savefig(path + "Signal[0,1]" + ".pdf")
 
 fig, ax = cw_src.draw_amplitudes(sin_data, color1)
 fig.savefig(path + "ScaledSignal" + ".pdf")

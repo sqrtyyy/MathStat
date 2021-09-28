@@ -2,6 +2,8 @@ import math
 
 import numpy as np
 from matplotlib import pyplot as plt
+import scipy.optimize as opt
+from numba import njit
 
 
 def read_file(file_name: str, array_size: int) -> np.array:
@@ -63,10 +65,10 @@ def draw_arcsin_lines(a1: float, b1: float, a2: float, b2: float, ax, num_of_dot
 
 def draw_delta_times(data: np.array, num_of_dots: int, ax) -> np.array:
     t_i = np.zeros(num_of_dots)
-    for i in range(num_of_dots):
-        t_i[i] = (data[i + 1] - data[i]) / (2 * math.pi)
-    t_i = np.add(t_i, abs(min(t_i)))
-    ax.set_xlabel('time(ps)')
+    for i in range(1, num_of_dots):
+        t_i[i] = t_i[i - 1] + abs(data[i] - data[i + 1]) / (2 * 100 * 10**6 * math.pi)
+   # t_i = np.add(t_i, abs(min(t_i)))
+    ax.set_xlabel('time(s)')
     ax.scatter(t_i, [1] * num_of_dots, marker='.')
     return t_i
 
@@ -74,8 +76,8 @@ def draw_delta_times(data: np.array, num_of_dots: int, ax) -> np.array:
 def draw_hist(data: np.array, ax) -> None:
     y = []
     for element in data:
-        y.append(element / (2 * math.pi))
-    ax.set_xlabel('time')
+        y.append(element / (2 * 100 * 10**6 * math.pi))
+    ax.set_xlabel('time(s)')
     ax.hist(y, bins=16)
 
 def restore_fun(data: np.array, x_i: np.array, tolerance: float):
@@ -96,12 +98,46 @@ def restore_fun(data: np.array, x_i: np.array, tolerance: float):
                                  for i in range(1, x_i.size - 1)])
 
     p_n = lambda x: p_0(x) + alpha * sum([(data[i] - p_0(x_i[i])) * w_i(i) * D_M(x - x_i[i])
-                                         for i in range(1, x_i.size - 1)])
+                                          for i in range(1, x_i.size - 1)])
 
     while math.isclose(p_n(x_i[10]), p_0(x_i[10]), abs_tol=tolerance):
         p_n_1 = p_0
         p_0 = p_n
         p_n = lambda x: p_0(x) + alpha * sum([(data[i] - p_n_1(x_i[i])) * w_i(i) * D_M(x - x_i[i])
-                                             for i in range(1, x_i.size - 1)])
+                                              for i in range(1, x_i.size - 1)])
 
     return p_n
+
+
+def lsm_params(x: np.array, y: np.ndarray):
+    beta_1 = np.mean(x * y) - np.mean(x) * np.mean(y)
+    beta_0 = np.mean(y) - np.mean(x) * beta_1
+    return beta_0, beta_1
+
+def lmm_params(x: np.ndarray, y: np.ndarray) -> tuple:
+    beta_0, beta_1 = lsm_params(x, y)
+    result = opt.minimize(lambda cur_beta: sum(abs(y[i] - cur_beta[0] - cur_beta[1] * x[i]) for i in range(len(x))),
+                          x0=np.asarray([beta_0, beta_1]))
+    return result.x[0], result.x[1]
+
+
+# def get_coeffs(x : np.array, y : np.array):
+#     return lsm_params(x, y)
+def get_coeffs(constants: np.ndarray, datas: np.ndarray):
+    a = np.zeros(datas.shape[1])
+    b = np.zeros(datas.shape[1])
+    for i in range(datas.shape[1]):
+        y = datas[..., i]
+        b[i], a[i] = lmm_params(constants, y)
+    return a, b
+
+
+def interpolate(constants: np.array, datas: np.array, signal: np.array, ax):
+    a, b = get_coeffs(constants=constants, datas=datas)
+    ax.scatter(constants, [datas[i][10] for i in range(datas.shape[0])], marker = '.', color= "r")
+    x = np.linspace(min(constants), max(constants), 100)
+    y = a[10] * x + b[10]
+    ax.plot(x, y)
+    ax.set_xlabel("constants")
+    ax.set_ylabel("y")
+    return np.arcsin((signal - b) / a)
